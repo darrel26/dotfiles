@@ -1,0 +1,66 @@
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="spaceship"
+
+# Disable update checks
+zstyle ':omz:update' mode disabled
+
+# Faster completion
+autoload -Uz compinit
+if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
+
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ~/.zsh/cache
+
+# Plugins
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+
+# Autosuggest tuning
+ZSH_AUTOSUGGEST_STRATEGY=(history)
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=10
+ZSH_AUTOSUGGEST_USE_ASYNC=1
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+
+# Disable heavy paste handler
+DISABLE_MAGIC_FUNCTIONS="true"
+
+# Spaceship tuning
+SPACESHIP_PROMPT_ASYNC=true
+SPACESHIP_PROMPT_ADD_NEWLINE=false
+SPACESHIP_PROMPT_SEPARATE_LINE=false
+SPACESHIP_TIME_SHOW=false
+
+# git branch fuzzy finder
+gbfc() {
+  git for-each-ref --format='%(refname:short)' refs/heads refs/remotes | \
+  fzf --height=40% --reverse --prompt="Checkout branch > " | \
+  sed 's#^origin/##' | \
+  xargs -r git checkout
+}
+
+# git rebase head
+gri() {
+  local n=${1:-1}   # default to 5 if not provided
+
+  if ! [[ "$n" =~ ^[0-9]+$ ]]; then
+    echo "Error: argument must be a number"
+    return 1
+  fi
+
+  git rebase -i HEAD~"$n"
+}
+
+# Aliases
+# Git
+alias gs="git status"
+alias gcm="git commit -m"
+alias gp="git pull && git push"
+alias ulc='git reset --soft HEAD~1'
+alias gst="git stash"
+alias pop="git stash pop"
+alias gstapp="git stash apply"
+
+source $ZSH/oh-my-zsh.sh
